@@ -10,6 +10,7 @@ namespace AssetSpawner.Editor
 {
     public static class AssetBundleBuilder
     {
+        private const string GenericGroupBundleName = "generic_group_bundle";
         
         public static AssetSpawnerInfo ExtractData(GameObject prefab)
         {
@@ -28,7 +29,7 @@ namespace AssetSpawner.Editor
             //if it's not set, set a new one dynamically
             if (string.IsNullOrEmpty(importer.assetBundleName))
             {
-                importer.SetAssetBundleNameAndVariant(guid, "");
+                importer.SetAssetBundleNameAndVariant(GenericGroupBundleName, "");
             }
             
             Debug.Log($"AssetBundle Name: {importer.assetBundleName}");

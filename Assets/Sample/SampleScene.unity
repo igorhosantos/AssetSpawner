@@ -523,7 +523,7 @@ MonoBehaviour:
   prefabRefToSpawn: {fileID: 0}
   AssetKey: 512de43c36f4a494180b3600ddebc2ce
   AssetName: Lara
-  AssetBundleName: 512de43c36f4a494180b3600ddebc2ce
+  AssetBundleName: generic_group_bundle
 --- !u!1 &1798206793
 GameObject:
   m_ObjectHideFlags: 0

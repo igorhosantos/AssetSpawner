@@ -1,6 +1,6 @@
 ManifestFileVersion: 0
 UnityVersion: 6000.3.19f1
-CRC: 811568581
+CRC: 2566387867
 HashAppended: 0
 AssetBundleManifest:
   AssetBundleInfos:
@@ -14,5 +14,5 @@ AssetBundleManifest:
       Name: characters_group_b
       Dependencies: {}
     Info_3:
-      Name: 512de43c36f4a494180b3600ddebc2ce
+      Name: generic_group_bundle
       Dependencies: {}
