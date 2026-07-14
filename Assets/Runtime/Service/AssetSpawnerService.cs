@@ -9,41 +9,51 @@ using Object = UnityEngine.Object;
 
 namespace AssetSpawner.Service
 {
-    public class AssetSpawnerService: IAssetSpawnerService
+    public class AssetSpawnerService : IAssetSpawnerService
     {
-        private Dictionary<string, AssetSpawnerInfo> _assetSpawnerInfos = new  Dictionary<string, AssetSpawnerInfo>();
-        private List<AssetBundle> _loadedBundles = new List<AssetBundle>();
-        private Dictionary<string,GameObject> _allGameObjects = new Dictionary<string, GameObject>();
-        private bool _assetsAreReady = false;
-        
+        private enum LoadState
+        {
+            Loading,
+            Ready,
+            Failed
+        }
+
+        private readonly List<AssetBundle> _loadedBundles = new List<AssetBundle>();
+        private readonly Dictionary<string, GameObject> _allGameObjects = new Dictionary<string, GameObject>();
+        private LoadState _loadState = LoadState.Loading;
+
         public IEnumerator SpawnAsset(string assetKey, Transform container)
         {
-            yield return new WaitUntil(() => _assetsAreReady);
+            yield return new WaitUntil(() => _loadState != LoadState.Loading);
+
+            if (_loadState == LoadState.Failed)
+            {
+                Debug.LogError($"[AssetSpawnerService] Cannot spawn '{assetKey}': asset loading failed.");
+                yield break;
+            }
 
             try
             {
                 if (!_allGameObjects.TryGetValue(assetKey, out GameObject gameObject))
                 {
-                    Debug.LogError($"[AssetSpawnerService] {assetKey} not found");
+                    Debug.LogError($"[AssetSpawnerService] '{assetKey}' not found.");
                     yield break;
                 }
-                
-                //TODO implement object pooling 
-                var instance = Object.Instantiate(gameObject, container);
-                Debug.Log($"[AssetSpawnerService] {assetKey} spawn Successfully");  
+
+                //TODO implement object pooling
+                Object.Instantiate(gameObject, container);
+                Debug.Log($"[AssetSpawnerService] '{assetKey}' spawned successfully.");
             }
             catch (Exception e)
             {
-                Debug.LogError($"[AssetSpawnerService] error during spawn asset: {e}");
+                Debug.LogError($"[AssetSpawnerService] Error during spawn asset: {e}");
             }
         }
-        
-       public IEnumerator LoadAllBundlesRoutine()
-       {
-            // 1. Determine the correct path according to the running platform
+
+        public IEnumerator LoadAllBundlesRoutine()
+        {
             string basePath = $"{Application.streamingAssetsPath}/AssetBundles";
-            
-            // 2. Load the main manifest bundle first
+
             string manifestBundlePath = Path.Combine(basePath, "AssetBundles");
             AssetBundleCreateRequest manifestLoadRequest = AssetBundle.LoadFromFileAsync(manifestBundlePath);
             yield return manifestLoadRequest;
@@ -51,24 +61,21 @@ namespace AssetSpawner.Service
             AssetBundle manifestBundle = manifestLoadRequest.assetBundle;
             if (manifestBundle == null)
             {
-                Debug.LogError($"Failed to load main manifest bundle at: {manifestBundlePath}");
+                SetLoadFailed($"Failed to load main manifest bundle at: {manifestBundlePath}");
                 yield break;
             }
 
-            // 3. Extract the AssetBundleManifest object from the bundle
             AssetBundleManifest manifest = manifestBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
             if (manifest == null)
             {
-                Debug.LogError("Failed to extract AssetBundleManifest object.");
                 manifestBundle.Unload(false);
+                SetLoadFailed("Failed to extract AssetBundleManifest object.");
                 yield break;
             }
 
-            // 4. Get the names of all built bundles listed inside the manifest
             string[] bundleNames = manifest.GetAllAssetBundles();
             Debug.Log($"Found {bundleNames.Length} bundles to load.");
 
-            // 5. Iterate and load each individual AssetBundle
             foreach (string bundleName in bundleNames)
             {
                 string individualBundlePath = Path.Combine(basePath, bundleName);
@@ -87,33 +94,98 @@ namespace AssetSpawner.Service
                 }
             }
 
-            // 6. Unload the manifest container bundle (keep loaded assets intact) to save memory
             manifestBundle.Unload(false);
-            
-            yield return OnAllBundlesLoaded();
+
+            yield return OnAllBundlesLoaded(basePath);
         }
 
-        private IEnumerator OnAllBundlesLoaded()
+        private IEnumerator OnAllBundlesLoaded(string basePath)
         {
-            IEnumerable<AssetBundle> loadedBundles = AssetBundle.GetAllLoadedAssetBundles();
-
-            foreach (AssetBundle loadedBundle in loadedBundles)
+            if (!TryLoadAssetManifest(basePath, out AssetManifest assetManifest))
             {
-                Debug.Log(loadedBundle.name);
+                SetLoadFailed(
+                    $"Missing or invalid asset manifest at '{Path.Combine(basePath, AssetManifest.FileName)}'. Rebuild AssetBundles from the editor.");
+                yield break;
+            }
+
+            var prefabsByName = new Dictionary<string, GameObject>();
+
+            foreach (AssetBundle loadedBundle in _loadedBundles)
+            {
                 AssetBundleRequest request = loadedBundle.LoadAllAssetsAsync<GameObject>();
-                yield return request; // or await request;
+                yield return request;
+
                 foreach (Object asset in request.allAssets)
                 {
                     if (asset is GameObject prefab)
                     {
-                        Debug.Log($"Cache Prefab: {prefab.name}");
-                        _allGameObjects.Add(prefab.name, prefab);
+                        if (!prefabsByName.TryAdd(prefab.name, prefab))
+                        {
+                            Debug.LogWarning(
+                                $"[AssetSpawnerService] Duplicate prefab name '{prefab.name}' found while caching bundles.");
+                        }
                     }
                 }
             }
-            
-            Debug.Log("All AssetBundles have been successfully cached!!");
-            _assetsAreReady = true;
+
+            foreach (AssetManifestEntry entry in assetManifest.Entries)
+            {
+                if (string.IsNullOrEmpty(entry.AssetKey))
+                {
+                    continue;
+                }
+
+                if (!prefabsByName.TryGetValue(entry.AssetName, out GameObject prefab))
+                {
+                    Debug.LogWarning(
+                        $"[AssetSpawnerService] Manifest entry '{entry.AssetKey}' references missing prefab '{entry.AssetName}'.");
+                    continue;
+                }
+
+                if (!_allGameObjects.TryAdd(entry.AssetKey, prefab))
+                {
+                    Debug.LogWarning(
+                        $"[AssetSpawnerService] Duplicate AssetKey '{entry.AssetKey}' found in manifest.");
+                }
+            }
+
+            if (_allGameObjects.Count == 0)
+            {
+                SetLoadFailed("No spawnable assets were cached from the asset manifest.");
+                yield break;
+            }
+
+            Debug.Log($"All AssetBundles have been successfully cached ({_allGameObjects.Count} assets).");
+            _loadState = LoadState.Ready;
+        }
+
+        private static bool TryLoadAssetManifest(string basePath, out AssetManifest manifest)
+        {
+            manifest = null;
+            string manifestPath = Path.Combine(basePath, AssetManifest.FileName);
+
+            if (!File.Exists(manifestPath))
+            {
+                return false;
+            }
+
+            try
+            {
+                string json = File.ReadAllText(manifestPath);
+                manifest = JsonUtility.FromJson<AssetManifest>(json);
+                return manifest?.Entries != null && manifest.Entries.Length > 0;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[AssetSpawnerService] Failed to read asset manifest: {e}");
+                return false;
+            }
+        }
+
+        private void SetLoadFailed(string message)
+        {
+            Debug.LogError($"[AssetSpawnerService] {message}");
+            _loadState = LoadState.Failed;
         }
     }
 }

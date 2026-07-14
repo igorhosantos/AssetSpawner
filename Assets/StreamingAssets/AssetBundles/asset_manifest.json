@@ -1,0 +1,29 @@
+{
+    "Entries": [
+        {
+            "AssetKey": "9d79aed9c420ebe4596900cf99a669fd",
+            "AssetName": "Eric",
+            "AssetBundleName": "characters_group_a"
+        },
+        {
+            "AssetKey": "e359d6533fb152c46ab3cfff78d9d065",
+            "AssetName": "MarcoPolo",
+            "AssetBundleName": "characters_group_a"
+        },
+        {
+            "AssetKey": "46fc56f7a9471394691ef533847240f7",
+            "AssetName": "Tarma",
+            "AssetBundleName": "characters_group_b"
+        },
+        {
+            "AssetKey": "b96b648c2c7eb00408645a70f45a1b3c",
+            "AssetName": "Ralf",
+            "AssetBundleName": "characters_group_b"
+        },
+        {
+            "AssetKey": "512de43c36f4a494180b3600ddebc2ce",
+            "AssetName": "Lara",
+            "AssetBundleName": "generic_group_bundle"
+        }
+    ]
+}

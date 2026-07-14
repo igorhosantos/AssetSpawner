@@ -30,30 +30,35 @@ namespace AssetSpawner
 
         private IEnumerator ProcessSpawn()
         {
-            yield return _assetSpawnerService.SpawnAsset(AssetName, this.transform);
+            if (string.IsNullOrEmpty(AssetKey))
+            {
+                Debug.LogError($"[RuntimeAssetSpawner] AssetKey is empty on '{name}'. Assign a prefab in the inspector.", this);
+                yield break;
+            }
+
+            yield return _assetSpawnerService.SpawnAsset(AssetKey, transform);
         }
 
+#if UNITY_EDITOR
         private void OnValidate()
         {
-            if(prefabRefToSpawn && !Application.isPlaying)
+            if (prefabRefToSpawn != null && !Application.isPlaying)
             {
-                StartCoroutine(UpdateAssetReference());
+                UpdateAssetReference();
             }
         }
 
-        private IEnumerator UpdateAssetReference()
+        private void UpdateAssetReference()
         {
-#if UNITY_EDITOR
             Debug.Log("RuntimeAssetSpawner UpdateAssetReference");
-           
+
             AssetSpawnerInfo info = AssetBundleBuilder.ExtractData(prefabRefToSpawn);
             AssetKey = info.AssetKey;
             AssetName = info.AssetName;
             AssetBundleName = info.AssetBundleName;
             prefabRefToSpawn = null;
-#endif
-            yield return null;
         }
+#endif
         
     }
 }
