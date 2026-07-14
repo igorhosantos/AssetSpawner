@@ -18,9 +18,6 @@ namespace AssetSpawner
         //TODO inject using service locator
         private IAssetSpawnerService _assetSpawnerService;
         
-#if UNITY_EDITOR
-        private AssetBundleBuilder _assetBundleBuilder;
-#endif
         public string AssetKey;
         public string AssetName;
         public string AssetBundleName;
@@ -38,25 +35,25 @@ namespace AssetSpawner
 
         private void OnValidate()
         {
-            if(prefabRefToSpawn)
+            if(prefabRefToSpawn && !Application.isPlaying)
             {
-                UpdateAssetReference();
+                StartCoroutine(UpdateAssetReference());
             }
         }
 
-        private void UpdateAssetReference()
+        private IEnumerator UpdateAssetReference()
         {
 #if UNITY_EDITOR
             Debug.Log("RuntimeAssetSpawner UpdateAssetReference");
-            
-            _assetBundleBuilder ??= new AssetBundleBuilder();
-            AssetSpawnerInfo info = _assetBundleBuilder.ExtractData(prefabRefToSpawn);
+           
+            AssetSpawnerInfo info = AssetBundleBuilder.ExtractData(prefabRefToSpawn);
             AssetKey = info.AssetKey;
             AssetName = info.AssetName;
             AssetBundleName = info.AssetBundleName;
             prefabRefToSpawn = null;
 #endif
-
+            yield return null;
         }
+        
     }
 }

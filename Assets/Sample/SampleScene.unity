@@ -521,9 +521,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RuntimeAssetSpawner
   prefabRefToSpawn: {fileID: 0}
-  AssetKey: e359d6533fb152c46ab3cfff78d9d065
-  AssetName: Marco
-  AssetBundleName: characters_group_a
+  AssetKey: 512de43c36f4a494180b3600ddebc2ce
+  AssetName: Lara
+  AssetBundleName: 512de43c36f4a494180b3600ddebc2ce
 --- !u!1 &1798206793
 GameObject:
   m_ObjectHideFlags: 0
@@ -554,9 +554,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RuntimeAssetSpawner
   prefabRefToSpawn: {fileID: 0}
-  AssetKey: b96b648c2c7eb00408645a70f45a1b3c
-  AssetName: Ralf
-  AssetBundleName: characters_group_b
+  AssetKey: e359d6533fb152c46ab3cfff78d9d065
+  AssetName: MarcoPolo
+  AssetBundleName: characters_group_a
 --- !u!4 &1798206795
 Transform:
   m_ObjectHideFlags: 0
@@ -566,7 +566,7 @@ Transform:
   m_GameObject: {fileID: 1798206793}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.239, z: 2.9}
+  m_LocalPosition: {x: -1.83, y: 0.239, z: 2.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

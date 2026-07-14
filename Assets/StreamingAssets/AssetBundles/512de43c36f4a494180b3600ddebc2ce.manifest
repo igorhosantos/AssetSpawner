@@ -1,16 +1,16 @@
 ManifestFileVersion: 0
 UnityVersion: 6000.3.19f1
-CRC: 50603306
+CRC: 2043276317
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 7c5652ab046319bd63e3a7c050eaee84
+    Hash: 297f4caf8b402a4916eae6e69a2f6880
   TypeTreeHash:
     serializedVersion: 2
     Hash: 4c5ba1fe82307063ccb42880e3fcdae3
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: e81ec747d7014c3f0f8b5a38c88cce18
+    Hash: 001797ed810714978e972dff624d28ba
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -33,6 +33,5 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/Resources/Prefabs/CharactersGroupB/EriNewName.prefab
-- Assets/Resources/Prefabs/CharactersGroupC/MarcoPolo.prefab
+- Assets/Resources/Prefabs/CharactersGroupA/Lara.prefab
 Dependencies: []

@@ -8,10 +8,10 @@ using UnityEngine;
 
 namespace AssetSpawner.Editor
 {
-    public class AssetBundleBuilder
+    public static class AssetBundleBuilder
     {
         
-        public AssetSpawnerInfo ExtractData(GameObject prefab)
+        public static AssetSpawnerInfo ExtractData(GameObject prefab)
         {
             //get the current asset path of the prefab
             string assetPath = AssetDatabase.GetAssetPath(prefab);
@@ -39,7 +39,9 @@ namespace AssetSpawner.Editor
         [MenuItem("AssetSpawner/Build AssetBundles")]
         public static void BuildAllAssetBundles()
         {
-            string assetBundleDirectory =  $"{Application.streamingAssetsPath}/AssetBundles";;
+            Debug.Log("AssetBundleBuilder BuildAllAssetBundles");
+            
+            string assetBundleDirectory =  $"{Application.streamingAssetsPath}/AssetBundles";
             try
             {
                 //ensure the directory exists
