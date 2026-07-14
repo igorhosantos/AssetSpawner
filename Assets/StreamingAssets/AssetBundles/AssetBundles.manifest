@@ -1,0 +1,15 @@
+ManifestFileVersion: 0
+UnityVersion: 6000.3.19f1
+CRC: 2748899743
+HashAppended: 0
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: unifiedraytracing
+      Dependencies: {}
+    Info_1:
+      Name: characters_group_a
+      Dependencies: {}
+    Info_2:
+      Name: characters_group_b
+      Dependencies: {}
