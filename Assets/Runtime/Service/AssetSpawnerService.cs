@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using AssetSpawner.Model;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 
 namespace AssetSpawner.Service
@@ -12,19 +14,28 @@ namespace AssetSpawner.Service
         private Dictionary<string, AssetSpawnerInfo> _assetSpawnerInfos = new  Dictionary<string, AssetSpawnerInfo>();
         private List<AssetBundle> _loadedBundles = new List<AssetBundle>();
         private Dictionary<string,GameObject> _allGameObjects = new Dictionary<string, GameObject>();
-        
         private bool _assetsAreReady = false;
         
         public IEnumerator SpawnAsset(string assetKey, Transform container)
         {
             yield return new WaitUntil(() => _assetsAreReady);
-            
-            Debug.Log($"[AssetSpawnerService] try spawn: {assetKey}"); 
-            
-            var instance = Object.Instantiate(_allGameObjects[assetKey], container);
-            
-            Debug.Log($"[AssetSpawnerService] {assetKey} spawn Successfully");  
-            yield break;
+
+            try
+            {
+                if (!_allGameObjects.TryGetValue(assetKey, out GameObject gameObject))
+                {
+                    Debug.LogError($"[AssetSpawnerService] {assetKey} not found");
+                    yield break;
+                }
+                
+                //TODO implement object pooling 
+                var instance = Object.Instantiate(gameObject, container);
+                Debug.Log($"[AssetSpawnerService] {assetKey} spawn Successfully");  
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[AssetSpawnerService] error during spawn asset: {e}");
+            }
         }
         
        public IEnumerator LoadAllBundlesRoutine()
@@ -86,7 +97,6 @@ namespace AssetSpawner.Service
         {
             IEnumerable<AssetBundle> loadedBundles = AssetBundle.GetAllLoadedAssetBundles();
 
-            Debug.Log("--- Currently Loaded AssetBundles ---");
             foreach (AssetBundle loadedBundle in loadedBundles)
             {
                 Debug.Log(loadedBundle.name);
@@ -96,7 +106,7 @@ namespace AssetSpawner.Service
                 {
                     if (asset is GameObject prefab)
                     {
-                        Debug.Log($"--- Found Prefab: {prefab.name}");
+                        Debug.Log($"Cache Prefab: {prefab.name}");
                         _allGameObjects.Add(prefab.name, prefab);
                     }
                 }
