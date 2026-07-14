@@ -13,11 +13,13 @@ namespace AssetSpawner
 
     public class RuntimeAssetSpawner : MonoBehaviour
     {
+        [Header("Drag N Drop Here the prefab you want to spawn")]
         public GameObject prefabRefToSpawn;
         
         //TODO inject using service locator
         private IAssetSpawnerService _assetSpawnerService;
-        
+
+        [Header("After Drop the prefab, all the properties will refresh")]
         public string AssetKey;
         public string AssetName;
         public string AssetBundleName;
