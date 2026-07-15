@@ -8,5 +8,13 @@ namespace AssetSpawner.Service
     {
         IEnumerator LoadAllBundlesRoutine();
         IEnumerator SpawnAsset(string assetKey, Transform container);
+        
+        public enum LoadState
+        {
+            Loading,
+            Ready,
+            Failed
+        }
     }
+    
 }
