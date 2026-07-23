@@ -1,16 +1,16 @@
 ManifestFileVersion: 0
 UnityVersion: 6000.3.19f1
-CRC: 1166091522
+CRC: 1341261279
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 90d8fd663d2996561dc99670d4649b72
+    Hash: 85b27f495dc6c4d82d07762d48a53f04
   TypeTreeHash:
     serializedVersion: 2
     Hash: 4c5ba1fe82307063ccb42880e3fcdae3
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: ae18fa6030b87528a31b99fb20fccbd5
+    Hash: 6417259b0d7f1bc8618236b67953e223
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -34,5 +34,5 @@ ClassTypes:
 SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/Resources/Prefabs/CharactersGroupB/Tarma.prefab
-- Assets/Resources/Prefabs/CharactersGroupC/Ralf.prefab
+- Assets/Resources/Prefabs/CharactersGroupC/RalfNewName.prefab
 Dependencies: []

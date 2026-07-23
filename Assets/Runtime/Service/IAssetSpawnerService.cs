@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -6,15 +7,26 @@ namespace AssetSpawner.Service
 {
     public interface IAssetSpawnerService
     {
-        IEnumerator LoadAllBundlesRoutine();
+        IEnumerator InitializeService();
         IEnumerator SpawnAsset(string assetKey, Transform container);
-        
-        public enum LoadState
+    }
+
+    [Serializable]
+    public class AssetSpawnerSettings
+    {
+        public enum Providers
         {
-            Loading,
-            Ready,
-            Failed
+            StandardAssetBundle = 0,
         }
+        
+        public enum LoadingTypes
+        {
+            OnDemand = 0,
+            LoadAndCacheAll = 1,
+        }
+        
+        public Providers ProviderType;
+        public LoadingTypes LoadingType;
     }
     
 }
