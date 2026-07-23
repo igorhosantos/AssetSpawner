@@ -18,7 +18,7 @@ namespace AssetSpawner.Service
         {
             Debug.Log($"[AssetSpawnerService] Initialized: {settings.ProviderType} - {settings.LoadingType}");
             _settings = settings;
-            _assetProvider = AssetProvidersFactory.CreateProvider(settings.ProviderType);
+            _assetProvider = AssetProvidersFactory.CreateProvider(settings);
         }
         public IEnumerator SpawnAsset(string assetKey, Transform container)
         {

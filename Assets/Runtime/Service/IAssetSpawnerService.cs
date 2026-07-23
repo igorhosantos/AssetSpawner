@@ -27,6 +27,7 @@ namespace AssetSpawner.Service
         
         public Providers ProviderType;
         public LoadingTypes LoadingType;
+        public string StreamingAssetPath;
     }
     
 }

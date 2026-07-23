@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using AssetSpawner.Model;
+using AssetSpawner.Service;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -11,25 +12,31 @@ namespace AssetSpawner.Providers
 {
     public class AssetBundleProviderService : IAssetProviderService
     {
-        private readonly List<AssetBundle> _loadedBundles = new List<AssetBundle>();
-        private static string basePath = $"{Application.streamingAssetsPath}/AssetBundles";
-        private static string manifestBundlePath = Path.Combine(basePath, "AssetBundles");
-        private Dictionary<string, GameObject> _loadedAssets = new Dictionary<string, GameObject>();
         public IAssetProviderService.AssetLoadState LoadState { get; set; } =
             IAssetProviderService.AssetLoadState.NotInitialized;
-        
+        private readonly List<AssetBundle> _loadedBundles = new List<AssetBundle>();
+        private Dictionary<string, GameObject> _loadedAssets = new Dictionary<string, GameObject>();
+        private string _basePath;
+        private string _manifestBundlePath;
+        private AssetSpawnerSettings _settings;
+        public AssetBundleProviderService(AssetSpawnerSettings settings)
+        {
+            this._settings = settings;
+            _basePath = $"{Application.streamingAssetsPath}/{settings.StreamingAssetPath}";
+            _manifestBundlePath = Path.Combine(_basePath, settings.StreamingAssetPath);
+        }
         public IEnumerator PrefetchAssets()
         {
             LoadState = IAssetProviderService.AssetLoadState.Loading;
             
-            AssetBundleCreateRequest manifestLoadRequest = AssetBundle.LoadFromFileAsync(manifestBundlePath);
+            AssetBundleCreateRequest manifestLoadRequest = AssetBundle.LoadFromFileAsync(_manifestBundlePath);
             
             yield return manifestLoadRequest;
 
             AssetBundle manifestBundle = manifestLoadRequest.assetBundle;
             if (manifestBundle == null)
             {
-                SetLoadFailed($"[AssetSpawnerService] Failed to load main manifest bundle at: {manifestBundlePath}");
+                SetLoadFailed($"[AssetSpawnerService] Failed to load main manifest bundle at: {_manifestBundlePath}");
                 yield break;
             }
 
@@ -46,7 +53,7 @@ namespace AssetSpawner.Providers
 
             foreach (string bundleName in bundleNames)
             {
-                string individualBundlePath = Path.Combine(basePath, bundleName);
+                string individualBundlePath = Path.Combine(_basePath, bundleName);
                 AssetBundleCreateRequest bundleLoadRequest = AssetBundle.LoadFromFileAsync(individualBundlePath);
                 yield return bundleLoadRequest;
 
@@ -67,10 +74,10 @@ namespace AssetSpawner.Providers
         
         public IEnumerator FetchAllAssets(Action<Dictionary<string, GameObject>> callback)
         {
-            if (!TryLoadAssetManifest(basePath, out AssetManifest assetManifest))
+            if (!TryLoadAssetManifest(_basePath, out AssetManifest assetManifest))
             {
                 SetLoadFailed(
-                    $"[AssetSpawnerService] Missing or invalid asset manifest at '{Path.Combine(basePath, AssetManifest.FileName)}'. Rebuild AssetBundles from the editor.");
+                    $"[AssetSpawnerService] Missing or invalid asset manifest at '{Path.Combine(_basePath, AssetManifest.FileName)}'. Rebuild AssetBundles from the editor.");
                 
                 yield break;
             }
@@ -129,10 +136,10 @@ namespace AssetSpawner.Providers
 
         public IEnumerator FetchAsset(string assetKey)
         {
-            if (!TryLoadAssetManifest(basePath, out AssetManifest assetManifest))
+            if (!TryLoadAssetManifest(_basePath, out AssetManifest assetManifest))
             {
                 SetLoadFailed(
-                    $"[AssetSpawnerService] Missing or invalid asset manifest at '{Path.Combine(basePath, AssetManifest.FileName)}'. Rebuild AssetBundles from the editor.");
+                    $"[AssetSpawnerService] Missing or invalid asset manifest at '{Path.Combine(_basePath, AssetManifest.FileName)}'. Rebuild AssetBundles from the editor.");
                 
                 yield break;
             }

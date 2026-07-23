@@ -15,3 +15,4 @@ MonoBehaviour:
   settings:
     ProviderType: 0
     LoadingType: 0
+    StreamingAssetPath: AssetBundles
