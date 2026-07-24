@@ -1,10 +1,7 @@
-#if UNITY_EDITOR
-using System;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-
 
 namespace AssetSpawner.Editor
 {
@@ -34,7 +31,7 @@ namespace AssetSpawner.Editor
             {
                 text = $"Update AssetBundles"
             };
-            buildAssetBundleButton.clickable.clicked += AssetBundleBuilder.BuildAllAssetBundles;
+           // buildAssetBundleButton.clickable.clicked += AssetBundleBuilder.BuildAllAssetBundles;
             myInspector.Add(buildAssetBundleButton);
 
             // Return the finished Inspector UI.
@@ -42,4 +39,3 @@ namespace AssetSpawner.Editor
         }
     }
 }
-#endif

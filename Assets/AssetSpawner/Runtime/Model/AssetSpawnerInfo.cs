@@ -1,6 +1,6 @@
 using System;
 
-namespace AssetSpawner.Model
+namespace AssetSpawner.Runtime.Model
 {
     [Serializable]
     public class AssetSpawnerInfo
