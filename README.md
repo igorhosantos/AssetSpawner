@@ -18,6 +18,9 @@ Asset Spawner Solution for helping Artists or Non-Technical members to Spawn Pre
 - RuntimeAssetSpawner is a monobehavior that allows you to attach to an empty GameObject, drag and drop a prefab, and it is going to be loaded and instantiated at runtime.
 
 
+![](media/asset_spawner.png)
+
+
 ### How to Use:
 
 There's a SampleScene in the project to open it in: Assets/Sample/SampleScene
@@ -30,8 +33,18 @@ There is a video attached in Amber\Media\asset_spawner_how_to_use.mp4 to show th
 5. (Optional) If you added new prefabs, renamed or changed the folders, and you want to reflect the changes in the AssetBundles, you can tap the button "Update AssetBundles" in the Script (Videos Attached as well )
 6. Run the Sample Scene
 
-### Architecture Overview:
 
+### AssetSpawner Settings
+
+![](media/asset_spawner_settings.png)
+
+The implementation follows a settings as a source of truth that allows to set different behaviors: 
+
+- Provider Type: 
+- Loading Type: 
+- Streaming AssetPath: 
+
+### Architecture Overview:
 
 ![](media/architecture.png)
 
