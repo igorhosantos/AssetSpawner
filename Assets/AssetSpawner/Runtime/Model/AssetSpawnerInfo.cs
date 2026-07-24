@@ -5,13 +5,13 @@ namespace AssetSpawner.Runtime.Model
     [Serializable]
     public class AssetSpawnerInfo
     {
-        public string AssetKey;
+        public string AssetGUI;
         public string AssetBundleName;
         public string AssetName;
 
-        public AssetSpawnerInfo(string assetKey,string assetName, string assetBundleName)
+        public AssetSpawnerInfo(string assetGUI,string assetName, string assetBundleName)
         {
-            this.AssetKey = assetKey;
+            this.AssetGUI = assetGUI;
             this.AssetName = assetName;
             this.AssetBundleName = assetBundleName;
         }

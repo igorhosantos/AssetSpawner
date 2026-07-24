@@ -31,7 +31,7 @@ namespace AssetSpawner.Editor
             {
                 text = $"Update AssetBundles"
             };
-           // buildAssetBundleButton.clickable.clicked += AssetBundleBuilder.BuildAllAssetBundles;
+            buildAssetBundleButton.clickable.clicked += AssetBundleBuilder.BuildAllAssetBundles;
             myInspector.Add(buildAssetBundleButton);
 
             // Return the finished Inspector UI.

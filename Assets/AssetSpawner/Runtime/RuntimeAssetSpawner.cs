@@ -18,11 +18,11 @@ namespace AssetSpawner
         [Header("Drag N Drop Here the prefab you want to spawn")]
         public GameObject prefabRefToSpawn;
         
-        //TODO inject using service locator
+        //injected by using service locator
         private IAssetSpawnerService _assetSpawnerService;
 
         [Header("After Drop the prefab, all the properties will refresh")]
-        public string AssetKey;
+        public string AssetGUI;
         public string AssetName;
         public string AssetBundleName;
         
@@ -34,13 +34,13 @@ namespace AssetSpawner
 
         private IEnumerator ProcessSpawn()
         {
-            if (string.IsNullOrEmpty(AssetKey))
+            if (string.IsNullOrEmpty(AssetGUI))
             {
                 Debug.LogError($"[RuntimeAssetSpawner] AssetKey is empty on '{name}'. Assign a prefab in the inspector.", this);
                 yield break;
             }
 
-            yield return _assetSpawnerService.SpawnAsset(AssetKey, transform);
+            yield return _assetSpawnerService.SpawnAsset(AssetGUI, transform);
         }
 
 #if UNITY_EDITOR
@@ -57,7 +57,7 @@ namespace AssetSpawner
             Debug.Log("RuntimeAssetSpawner UpdateAssetReference");
 
             AssetSpawnerInfo info = ExtractData(prefabRefToSpawn);
-            AssetKey = info.AssetKey;
+            AssetGUI = info.AssetGUI;
             AssetName = info.AssetName;
             AssetBundleName = info.AssetBundleName;
             prefabRefToSpawn = null;

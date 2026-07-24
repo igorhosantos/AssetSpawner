@@ -54,8 +54,7 @@ namespace AssetSpawner.Service
                     Debug.LogError($"[AssetSpawnerService] '{assetKey}' not found.");
                     yield break;
                 }
-
-                //TODO implement object pooling
+                
                 Object.Instantiate(gameObject, container);
                 Debug.Log($"[AssetSpawnerService] '{assetKey}' spawned successfully.");
             }
@@ -65,13 +64,13 @@ namespace AssetSpawner.Service
             }
         }
         
-        private IEnumerator LoadAndSpawnAsset(string assetKey, Transform container)
+        private IEnumerator LoadAndSpawnAsset(string assetGUI, Transform container)
         {
-           yield return _assetProvider.FetchAsset(assetKey);
-           yield return _assetProvider.GetAsset(assetKey, result =>
+           yield return _assetProvider.FetchAsset(assetGUI);
+           yield return _assetProvider.GetAsset(assetGUI, result =>
            {
                Object.Instantiate(result, container);
-               Debug.Log($"[AssetSpawnerService] '{assetKey}' spawned successfully.");
+               Debug.Log($"[AssetSpawnerService] '{assetGUI}' spawned successfully.");
            });
         }
 

@@ -21,7 +21,7 @@ namespace AssetSpawner.Providers
         private AssetSpawnerSettings _settings;
         public AssetBundleProviderService(AssetSpawnerSettings settings)
         {
-            this._settings = settings;
+            _settings = settings;
             _basePath = $"{Application.streamingAssetsPath}/{settings.StreamingAssetPath}";
             _manifestBundlePath = Path.Combine(_basePath, settings.StreamingAssetPath);
         }
@@ -36,7 +36,7 @@ namespace AssetSpawner.Providers
             AssetBundle manifestBundle = manifestLoadRequest.assetBundle;
             if (manifestBundle == null)
             {
-                SetLoadFailed($"[AssetSpawnerService] Failed to load main manifest bundle at: {_manifestBundlePath}");
+                SetLoadFailed($"[AssetBundleProviderService] Failed to load main manifest bundle at: {_manifestBundlePath}");
                 yield break;
             }
 
@@ -44,12 +44,12 @@ namespace AssetSpawner.Providers
             if (manifest == null)
             {
                 manifestBundle.Unload(false);
-                SetLoadFailed("[AssetSpawnerService] Failed to extract AssetBundleManifest object.");
+                SetLoadFailed("[AssetBundleProviderService] Failed to extract AssetBundleManifest object.");
                 yield break;
             }
 
             string[] bundleNames = manifest.GetAllAssetBundles();
-            Debug.Log($"[AssetSpawnerService] Found {bundleNames.Length} bundles to load.");
+            Debug.Log($"[AssetBundleProviderService] Found {bundleNames.Length} bundles to load.");
 
             foreach (string bundleName in bundleNames)
             {
@@ -61,11 +61,11 @@ namespace AssetSpawner.Providers
                 if (loadedBundle != null)
                 {
                     _loadedBundles.Add(loadedBundle);
-                    Debug.Log($"[AssetSpawnerService] Successfully loaded bundle: {bundleName}");
+                    Debug.Log($"[AssetBundleProviderService] Successfully loaded bundle: {bundleName}");
                 }
                 else
                 {
-                    Debug.LogError($"[AssetSpawnerService] Failed to load bundle: {bundleName} at path {individualBundlePath}");
+                    Debug.LogError($"[AssetBundleProviderService] Failed to load bundle: {bundleName} at path {individualBundlePath}");
                 }
             }
 
@@ -77,7 +77,7 @@ namespace AssetSpawner.Providers
             if (!TryLoadAssetManifest(_basePath, out AssetManifest assetManifest))
             {
                 SetLoadFailed(
-                    $"[AssetSpawnerService] Missing or invalid asset manifest at '{Path.Combine(_basePath, AssetManifest.FileName)}'. Rebuild AssetBundles from the editor.");
+                    $"[AssetBundleProviderService] Missing or invalid asset manifest at '{Path.Combine(_basePath, AssetManifest.FileName)}'. Rebuild AssetBundles from the editor.");
                 
                 yield break;
             }
@@ -96,7 +96,7 @@ namespace AssetSpawner.Providers
                         if (!prefabsByName.TryAdd(prefab.name, prefab))
                         {
                             Debug.LogWarning(
-                                $"[AssetSpawnerService] Duplicate prefab name '{prefab.name}' found while caching bundles.");
+                                $"[AssetBundleProviderService] Duplicate prefab name '{prefab.name}' found while caching bundles.");
                         }
                     }
                 }
@@ -112,14 +112,14 @@ namespace AssetSpawner.Providers
                 if (!prefabsByName.TryGetValue(entry.AssetName, out GameObject prefab))
                 {
                     Debug.LogWarning(
-                        $"[AssetSpawnerService] Manifest entry '{entry.AssetKey}' references missing prefab '{entry.AssetName}'.");
+                        $"[AssetBundleProviderService] Manifest entry '{entry.AssetKey}' references missing prefab '{entry.AssetName}'.");
                     continue;
                 }
 
                 if (!_loadedAssets.TryAdd(entry.AssetKey, prefab))
                 {
                     Debug.LogWarning(
-                        $"[AssetSpawnerService] Duplicate AssetKey '{entry.AssetKey}' found in manifest.");
+                        $"[AssetBundleProviderService] Duplicate AssetKey '{entry.AssetKey}' found in manifest.");
                 }
             }
 
@@ -139,7 +139,7 @@ namespace AssetSpawner.Providers
             if (!TryLoadAssetManifest(_basePath, out AssetManifest assetManifest))
             {
                 SetLoadFailed(
-                    $"[AssetSpawnerService] Missing or invalid asset manifest at '{Path.Combine(_basePath, AssetManifest.FileName)}'. Rebuild AssetBundles from the editor.");
+                    $"[AssetBundleProviderService] Missing or invalid asset manifest at '{Path.Combine(_basePath, AssetManifest.FileName)}'. Rebuild AssetBundles from the editor.");
                 
                 yield break;
             }
@@ -167,7 +167,7 @@ namespace AssetSpawner.Providers
                             bundleToCheck = loadedBundle;
                             assetManifestEntry = entry;
                             break;
-                        }
+                        } 
                     }
                 }
             }
@@ -175,12 +175,19 @@ namespace AssetSpawner.Providers
             try
             {
                 //load the bundle by the name 
-                var asset = bundleToCheck.LoadAsset<GameObject>(assetManifestEntry.AssetName);
-                _loadedAssets.Add(assetKey,asset);
+                if (bundleToCheck != null)
+                {
+                    var asset = bundleToCheck.LoadAsset<GameObject>(assetManifestEntry.AssetName);
+                    _loadedAssets.Add(assetKey,asset);
+                }
+                else
+                {
+                    Debug.LogError($"[AssetBundleProviderService] invalid bundle");
+                }
             }
             catch (Exception e)
             {
-                Debug.LogError($"[AssetSpawnerService] error on loading asset: {e}");
+                Debug.LogError($"[AssetBundleProviderService] error on loading asset: {e}");
             }
           
         }
@@ -194,7 +201,7 @@ namespace AssetSpawner.Providers
             }
             catch (Exception e)
             {
-               Debug.LogError($"[AssetSpawnerService] Failed to load asset: {e}");
+               Debug.LogError($"[AssetBundleProviderService] Failed to load asset: {e}");
             }
             
             yield return null;
@@ -219,14 +226,14 @@ namespace AssetSpawner.Providers
             }
             catch (Exception e)
             {
-                Debug.LogError($"[AssetSpawnerService] Failed to read asset manifest: {e}");
+                Debug.LogError($"[AssetBundleProviderService] Failed to read asset manifest: {e}");
                 return false;
             }
         }
 
         private void SetLoadFailed(string message)
         {
-            Debug.LogError($"[AssetSpawnerService] {message}");
+            Debug.LogError($"[AssetBundleProviderService] {message}");
             LoadState = IAssetProviderService.AssetLoadState.Failed;
         }
     }
